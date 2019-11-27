@@ -5,10 +5,10 @@
 import torch
 import itertools
 from image_pool import ImagePool
-from DN import networks
+import networks
 from torch.optim.lr_scheduler import MultiStepLR
 import os
-from DN.util import findLastCheckpoint
+from util import findLastCheckpoint
 
 class CycleGANModel():
 
@@ -37,7 +37,7 @@ class CycleGANModel():
                                         not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
         self.netG_B = networks.define_G(opt.output_nc, opt.input_nc, opt.ngf, opt.netG, opt.norm,
                                         not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
-        self.netDN = networks.define_G(2, 1, 64, 'unet_64')
+        self.netDN = networks.define_G(2, 1, 64, 'unet_64', 'batch', False, 'normal', 0.02, self.gpu_ids)
         # print(self.netG_A)
         # print(self.netG_B)
         if self.isTrain:  # define discriminators
@@ -133,8 +133,9 @@ class CycleGANModel():
         N, C, H, W = self.real_A.size()
         noise_sigma = torch.FloatTensor([self.noise_level for i in range(N)])
         noise_map = noise_sigma.view(N, 1, 1, 1).repeat(1, C, H, W)
+        noise_map = noise_map.to(self.device)
         self.dn_realA = torch.cat((self.real_A, noise_map), 1)
-
+        # self.dn_realA = self.dn_realA.to(self.device)
         self.dn_A = self.netDN(self.dn_realA)     # DN(A)
 
     def backward_D_basic(self, netD, real, fake):
@@ -216,3 +217,4 @@ class CycleGANModel():
         self.backward_D_A()      # calculate gradients for D_A
         self.backward_D_B()      # calculate graidents for D_B
         self.optimizer_D.step()  # update D_A and D_B's weights
+

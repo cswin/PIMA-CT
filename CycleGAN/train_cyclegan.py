@@ -29,7 +29,7 @@ parser.add_argument('--pool_size', type=int, default=50, help='the size of image
 parser.add_argument('--threshold', default=0.1, type=float, help='background threshold')
 parser.add_argument('--epoch', default=90, type=int, help='number of train epoches')
 parser.add_argument('--datatype', default='aligned', type=str, help='datatype: aligned or unaligned')
-parser.add_argument('--gpu_ids', type=str, default='-1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 parser.add_argument('--input_nc', type=int, default=1, help='# of input image channels: 3 for RGB and 1 for grayscale')
 parser.add_argument('--output_nc', type=int, default=1, help='# of output image channels: 3 for RGB and 1 for grayscale')
 parser.add_argument('--ngf', type=int, default=64, help='# of gen filters in the last conv layer')
@@ -51,7 +51,7 @@ parser.add_argument('--gan_mode', type=str, default='lsgan', help='the type of G
 parser.add_argument('--lr_policy', type=str, default='linear', help='learning rate policy. [linear | step | plateau | cosine]')
 parser.add_argument('--lr_decay_iters', type=int, default=50, help='multiply by a gamma every lr_decay_iters iterations')
 parser.add_argument('--model_dir', default='models', type=str)
-parser.add_argument('--DNmodel_dir', default='../DN/models/unet64_basic_condition_G/model_001.pth', type=str)
+parser.add_argument('--DNmodel_dir', default='../DN/models/unet64_basic_acgan_4_1_5_0_G/model_090.pth', type=str)
 args = parser.parse_args()
 
 if args.datatype == 'aligned':
@@ -59,7 +59,7 @@ if args.datatype == 'aligned':
     xs = xs.astype('float32') / 255.0
     xs = torch.from_numpy(xs.transpose((0, 1, 4, 2, 3)))  # tensor of the clean patches, N X C X H X W
     DDataset = AlignedDenoisingDataset(xs)
-    DLoader = DataLoader(dataset=DDataset, num_workers=0, drop_last=True, batch_size=args.batch_size, shuffle=True)
+    DLoader = DataLoader(dataset=DDataset, num_workers=4, drop_last=True, batch_size=args.batch_size, shuffle=True)
 
 else:
     dataA, dataB = dg.unaligned_datagenerator(args.from_does, args.to_60does, args.batch_size, args.aug_times, args.patch_size, args.stride, args.threshold)
@@ -68,7 +68,7 @@ else:
     dataA = torch.from_numpy(dataA.transpose((0, 3, 1, 2)))
     dataB = torch.from_numpy(dataB.transpose((0, 3, 1, 2)))
     DDataset = UnAlignedDenoisingDataset(dataA, dataB)
-    DLoader = DataLoader(dataset=DDataset, num_workers=0, drop_last=True, batch_size=args.batch_size, shuffle=True)
+    DLoader = DataLoader(dataset=DDataset, num_workers=4, drop_last=True, batch_size=args.batch_size, shuffle=True)
 
 model = CycleGANModel(args)
 model.load_networks(args)
@@ -79,3 +79,4 @@ for epoch in range(args.epoch):
         print('[%d/%d][%d/%d] Loss_DA: %.4f Loss_DB: %.4f Loss_G: %.4f' % (epoch, args.epoch, i, len(DLoader), model.loss_D_A, model.loss_D_B, model.loss_G))
     model.save_networks(args, epoch)
     model.update_learning_rate(epoch)
+

@@ -63,3 +63,4 @@ if __name__ == '__main__':
 
             name, ext = os.path.splitext(im)
             save_result(x_, path=os.path.join(args.result_dir, name + '_unet64' + ext))  # save the denoised image
+

@@ -175,3 +175,4 @@ def unaligned_datagenerator(from_dir, to_dir, batch_size, aug_times, patch_size,
 if __name__ == '__main__':
     data = unaligned_datagenerator('../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', '../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs', 128, 3, 64, 20, 0.1)
 
+
