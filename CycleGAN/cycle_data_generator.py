@@ -114,6 +114,28 @@ def aligned_datagenerator(from_dir, to_dir, batch_size, aug_times, patch_size, s
     print('^_^-training data finished-^_^')
     return data
 
+def aligned_datagenerator_bmp(from_dir, to_dir, batch_size, aug_times, patch_size, stride, threshold, verbose=False):
+    # generate clean patches from a dataset
+    file_list1 = glob.glob(from_dir+'/*.bmp')
+    file_list2 = glob.glob(to_dir+'/*.bmp')
+    file_list1 = sorted(file_list1)
+    file_list2 = sorted(file_list2)
+    # initrialize
+    data = []
+    # generate patches
+    for i in range(len(file_list1)):
+        patches = aligned_gen_patches(file_list1[i], file_list2[i], aug_times, patch_size, stride, threshold)
+        for patch in patches:
+            data.append(patch)
+        if verbose:
+            print(str(i+1) + '/' + str(len(file_list1)) + ' is done ^_^')
+    data = np.array(data, dtype='uint8')
+    data = np.expand_dims(data, axis=4)
+    discard_n = len(data)-len(data)//batch_size*batch_size  # because of batch namalization
+    data = np.delete(data, range(discard_n), axis=0)
+    print('^_^-training data finished-^_^')
+    return data
+
 def unaligned_gen_patches(file_name, aug_times, patch_size, stride, threshold):
     # get multiscale patches from a single image
     img = cv2.imread(file_name, 0)  # gray scale
@@ -134,8 +156,47 @@ def unaligned_gen_patches(file_name, aug_times, patch_size, stride, threshold):
 
 def unaligned_datagenerator(from_dir, to_dir, batch_size, aug_times, patch_size, stride, threshold, verbose=False):
     # generate clean patches from a dataset
-    file_list1 = glob.glob(from_dir+'/*.tif')
+    file_list1 = glob.glob(from_dir+'/*.bmp')
     file_list2 = glob.glob(to_dir+'/*.tif')
+    file_list1 = sorted(file_list1)
+    file_list2 = sorted(file_list2)
+    # initrialize
+    dataA = []
+    dataB = []
+    # generate A patches
+    for i in range(len(file_list1)):
+        patches = unaligned_gen_patches(file_list1[i], aug_times, patch_size, stride, threshold)
+        for patch in patches:
+            dataA.append(patch)
+        if verbose:
+            print(str(i+1) + '/' + str(len(file_list1)) + ' is done ^_^')
+
+    # generate A patches
+    for i in range(len(file_list2)):
+        patches = unaligned_gen_patches(file_list2[i], aug_times, patch_size, stride, threshold)
+        for patch in patches:
+            dataB.append(patch)
+        if verbose:
+            print(str(i + 1) + '/' + str(len(file_list1)) + ' is done ^_^')
+
+    dataA = np.array(dataA, dtype='uint8')
+    dataA = np.expand_dims(dataA, axis=4)
+    discard_n = len(dataA)-len(dataA)//batch_size*batch_size  # because of batch namalization
+    dataA = np.delete(dataA, range(discard_n), axis=0)
+    print('^_^-training dataA finished-^_^')
+
+    dataB = np.array(dataB, dtype='uint8')
+    dataB = np.expand_dims(dataB, axis=4)
+    discard_n = len(dataB) - len(dataB) // batch_size * batch_size  # because of batch namalization
+    dataB = np.delete(dataB, range(discard_n), axis=0)
+    print('^_^-training dataB finished-^_^')
+
+    return dataA, dataB
+
+def unaligned_datagenerator_bmp(from_dir, to_dir, batch_size, aug_times, patch_size, stride, threshold, verbose=False):
+    # generate clean patches from a dataset
+    file_list1 = glob.glob(from_dir+'/*.bmp')
+    file_list2 = glob.glob(to_dir+'/*.bmp')
     file_list1 = sorted(file_list1)
     file_list2 = sorted(file_list2)
     # initrialize
@@ -174,5 +235,4 @@ def unaligned_datagenerator(from_dir, to_dir, batch_size, aug_times, patch_size,
 
 if __name__ == '__main__':
     data = unaligned_datagenerator('../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', '../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs', 128, 3, 64, 20, 0.1)
-
 

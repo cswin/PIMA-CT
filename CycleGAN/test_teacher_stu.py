@@ -29,15 +29,15 @@ parser.add_argument('--output_nc', type=int, default=1, help='# of output image 
 parser.add_argument('--ngf', type=int, default=64, help='# of gen filters in the last conv layer')
 parser.add_argument('--ndf', type=int, default=64, help='# of discrim filters in the first conv layer')
 parser.add_argument('--n_layers_D', type=int, default=3, help='only used if netD==n_layers')
-parser.add_argument('--norm', type=str, default='instance', help='instance normalization or batch normalization [instance | batch | none]')
+parser.add_argument('--norm', type=str, default='batch', help='instance normalization or batch normalization [instance | batch | none]')
 parser.add_argument('--init_type', type=str, default='normal', help='network initialization [normal | xavier | kaiming | orthogonal]')
 parser.add_argument('--init_gain', type=float, default=0.02, help='scaling factor for normal, xavier and orthogonal.')
 parser.add_argument('--no_dropout', default=True,action='store_true', help='no dropout for the generator')
 parser.add_argument('--netG', type=str, default='unet_64', help='specify generator architecture [resnet_9blocks | resnet_6blocks | unet_64 | unet_256 | unet_128]')
-parser.add_argument('--modelGA_dir', default='models/teacher_stu_unet64_basic_iden_60_G_A/model_001_025.pth', type=str)
-parser.add_argument('--modelGB_dir', default='models/teacher_stu_unet64_basic_iden_60_G_B/model_001_025.pth', type=str)
-parser.add_argument('--GA_results', default='results/GA_iden_results_60/', type=str)
-parser.add_argument('--GB_results', default='results/GB_iden_results_60/', type=str)
+parser.add_argument('--modelGA_dir', default='models/unet64_basic_origincyclegan_noDN_l1loss_G_A/model_060.pth', type=str)
+parser.add_argument('--modelGB_dir', default='models/unet64_basic_origincyclegan_noDN_l1loss_G_B/model_060.pth', type=str)
+parser.add_argument('--GA_results', default='results/GAl1loss', type=str)
+parser.add_argument('--GB_results', default='results/GBl1loss', type=str)
 
 args = parser.parse_args()
 
@@ -114,4 +114,3 @@ for im in os.listdir(args.test_dataset):
 psnr_avg = np.mean(psnrs)
 ssim_avg = np.mean(ssims)
 print('PSNR = %2.2f dB, SSIM = %1.4f' % (psnr_avg, ssim_avg))
-

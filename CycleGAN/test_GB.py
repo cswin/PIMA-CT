@@ -17,11 +17,11 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 parser = argparse.ArgumentParser(description='PyTorch CycleGAN')
-parser.add_argument('--set_dir', default='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', type=str, help='directory of test dataset')
-parser.add_argument('--model_dir', default='models/', help='directory of the model:G_A==>high2low,simulate, G_B==>low2high,denoising')
-parser.add_argument('--model_name', default='pretrainGA.pth', type=str, help='the model name')
+parser.add_argument('--set_dir', default='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_30mAs', type=str, help='directory of test dataset')
+parser.add_argument('--model_dir', default=os.path.join('models', 'pretrain_GB_G_30mAs-175mAs'), help='directory of the model:G_A==>high2low,simulate, G_B==>low2high,denoising')
+parser.add_argument('--model_name', default='model_023.pth', type=str, help='the model name')
 parser.add_argument('--isTrain', default=False, help='Train or Test')
-parser.add_argument('--result_dir', default='results/175to60', type=str, help='directory of test dataset')
+parser.add_argument('--result_dir', default='l30to175', type=str, help='directory of test dataset')
 
 args = parser.parse_args()
 
@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     cuda = torch.cuda.is_available()
 
-    netG = networks.define_G(1, 1, 64, 'unet_64', 'batch', False, 'normal', 0.02)
+    netG = networks.define_G(1, 1, 64, 'unet_64', 'instance', False, 'normal', 0.02)
 
     if cuda:
         netG = netG.cuda()

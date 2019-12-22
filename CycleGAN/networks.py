@@ -1010,4 +1010,3 @@ if __name__ == '__main__':
     output = mynetwork(input)
     print(output.shape)
 
-
