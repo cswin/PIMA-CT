@@ -61,7 +61,7 @@ parser.add_argument('--lambda_identity', type=float, default=0.5,
                     help='use identity mapping. Setting lambda_identity other than 0 has an effect of scaling the weight of the identity mapping loss. For example, if the weight of the identity loss should be 10 times smaller than the weight of the reconstruction loss, please set lambda_identity = 0.1')
 # parser.add_argument('--lambda_DN', type=float, default=10.0, help='weight for DN(A) and fakeB')
 # parser.add_argument('--noise_level', type=float, default=0.171, help='noise level, default:60/175')
-parser.add_argument('--self_trainging_loss', type=int, default=2, help='1 for l1loss, 2 for l2loss' )
+parser.add_argument('--self_training_loss', type=int, default=2, help='1 for l1loss, 2 for l2loss' )
 parser.add_argument('--netD', type=str, default='basic',
                     help='specify discriminator architecture [basic | n_layers | pixel]. n_layers allows you to specify the layers in the discriminator')
 parser.add_argument('--netG', type=str, default='unet_64',
@@ -140,7 +140,7 @@ for teach_time in range(initial_time, args.teach_nums):
 
             if DLoader1 is not None:
                 data = next(data1_iter)
-                model.cyclemode = args.self_trainging_loss
+                model.cyclemode = args.self_training_loss
                 model.set_input(data)
                 model.optimize_parameters()
                 print('--------------- pseudo data ---------------')

@@ -12,6 +12,44 @@ pytorch==0.4.1
 
 
 
+## self-learning
+
+进入`LDNS/CycleGAN`目录下：
+
+```python
+# 根据gpu情况更改train_teacher_stu2.py和test_teacher_stu.py的参数
+os.environ["CUDA_VISIBLE_DEVICES"] = "8,9"
+parser.add_argument('--gpu_ids', type=str, default='0,1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+```
+
+
+
+```shell
+# 训练self-learning, 训练pseudo数据时使用L2_loss
+python train_teacher_stu2.py --model teacher_stu_unet64_basic_60_unaligned_l2loss --self_training_loss 2
+```
+
+```shell
+# 测试结果 结果保存在GA_results(simulation)和GB_results(denoised)
+python test_teacher_stu.py --modelGA_dir models/teacher_stu_unet64_basic_60_unaligned_l2loss_G_A/model_005_060.pth --modelGB_dir models/teacher_stu_unet64_basic_60_unaligned_l2loss_G_B/model_005_060.pth --GA_results results/GAl2loss --GB_results results/GBl2loss
+```
+
+
+
+```shell
+# 训练self-learning, 训练pseudo数据时使用L2_loss
+python train_teacher_stu2.py --model teacher_stu_unet64_basic_60_unaligned_l1loss --self_training_loss 1
+```
+
+```shell
+# 测试结果 结果保存在GA_results(simulation)和GB_results(denoised)
+python test_teacher_stu.py --modelGA_dir models/teacher_stu_unet64_basic_60_unaligned_l1loss_G_A/model_005_060.pth --modelGB_dir models/teacher_stu_unet64_basic_60_unaligned_l1loss_G_B/model_005_060.pth --GA_results results/GAl1loss --GB_results results/GBl1loss
+```
+
+
+
+
+
 ## Train DN
 
 
