@@ -14,12 +14,14 @@ from util import log
 from util import save_result
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "9"
 
 parser = argparse.ArgumentParser(description='PyTorch CycleGAN')
-parser.add_argument('--set_dir', default='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', type=str, help='directory of test dataset')
-parser.add_argument('--model_dir', default='models/', help='directory of the model:G_A==>high2low,simulate, G_B==>low2high,denoising')
-parser.add_argument('--model_name', default='pretrainGA.pth', type=str, help='the model name')
+parser.add_argument('--set_dir', default='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', type=str,
+                    help='directory of test dataset')
+parser.add_argument('--model_dir', default='./models/teacher_stu_unet64_basic_60_unaligned_l1loss_G_A',
+                    help='directory of the model:G_A==>high2low,simulate, G_B==>low2high,denoising')
+parser.add_argument('--model_name', default='model_003_010.pth', type=str, help='the model name')
 parser.add_argument('--isTrain', default=False, help='Train or Test')
 parser.add_argument('--result_dir', default='results/175to60', type=str, help='directory of test dataset')
 
@@ -58,9 +60,9 @@ if __name__ == '__main__':
             x_ = x_.cpu()
             x_ = x_.detach().numpy().astype(np.float32)
             x_ = cv2.resize(x_, (300, 410), interpolation=cv2.INTER_LINEAR)
-            
-            x_[np.where(pre_img==0)] = 0
-            
+
+            x_[np.where(pre_img == 0)] = 0
+
             # x_ = np.array(x_, dtype='uint8')
             elapsed_time = time.time() - start_time
             print('%10s : %2.4f second' % (im, elapsed_time))

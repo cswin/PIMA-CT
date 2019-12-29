@@ -40,6 +40,30 @@ class UnAlignedDenoisingDataset(Dataset):
     def __len__(self):
         return max(self.A_size, self.B_size)
 
+# 重写dataloader 有对应的图片来求denoising时的loss
+class BoseDenoisingDataset(Dataset):
+    def __init__(self, data_noise_free, real_noise, data_align):
+        super(BoseDenoisingDataset, self).__init__()
+        self.data_noise_free = data_noise_free
+        self.real_noise = real_noise
+        self.data_align = data_align
+        self.data_noise_free_size = data_noise_free.size(0)
+        self.real_noise_size = real_noise.size(0)
+        self.data_align_size = data_align.size(0)
+
+    def __getitem__(self, index):
+        noise_free = self.data_noise_free[index % self.data_noise_free_size]
+        real_noise_idx = random.randint(0, self.real_noise_size-1)
+        real_noise = self.real_noise[real_noise_idx % self.real_noise_size]
+        index_data_align = random.randint(0, self.data_align_size-1)
+        align = self.data_align[index_data_align % self.data_align_size]
+        return {'noise_free': noise_free, 'real_noise': real_noise, 'noise': align[0], 'no-noise': align[1]}
+
+    def __len__(self):
+        return max(max(self.data_noise_free_size, self.real_noise_size), self.data_align_size)
+
+
+
 def show(x, title=None, cbar=False, figsize=None):
     import matplotlib.pyplot as plt
     plt.figure(figsize=figsize)
@@ -91,11 +115,90 @@ def aligned_gen_patches(file_name1, file_name2, aug_times, patch_size, stride, t
                 patches.append((x_aug,y_aug))
     return patches
 
+def realA_datagenerator(dir1='../dataset/noise_free', batch_size=128, aug_times=3, patch_size=64, stride=20, threshold=0.1, verbose=False):
+    # generate clean patches from a dataset
+    file_list1 = glob.glob(dir1 + '/*.bmp') + glob.glob(dir1 + '/*.tif')
+    file_list1 = sorted(file_list1)
+    # initrialize
+    dataA = []
+    # generate A patches
+    for i in range(len(file_list1)):
+        patches = unaligned_gen_patches(file_list1[i], aug_times, patch_size, stride, threshold)
+        for patch in patches:
+            dataA.append(patch)
+        if verbose:
+            print(str(i + 1) + '/' + str(len(file_list1)) + ' is done ^_^')
+
+    dataA = np.array(dataA, dtype='uint8')
+    dataA = np.expand_dims(dataA, axis=4)
+    discard_n = len(dataA) - len(dataA) // batch_size * batch_size  # because of batch namalization
+    dataA = np.delete(dataA, range(discard_n), axis=0)
+    print('^_^-training dataA finished-^_^')
+    return dataA
+
+def realB_datagenerator(dir1='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs', batch_size=128, aug_times=3, patch_size=64, stride=20, threshold=0.1, verbose=False):
+    # generate clean patches from a dataset
+    file_list1 = glob.glob(dir1 + '/*.tif')
+    file_list1 = sorted(file_list1)
+    # initrialize
+    dataA = []
+    # generate A patches
+    for i in range(len(file_list1)):
+        patches = unaligned_gen_patches(file_list1[i], aug_times, patch_size, stride, threshold)
+        for patch in patches:
+            dataA.append(patch)
+        if verbose:
+            print(str(i + 1) + '/' + str(len(file_list1)) + ' is done ^_^')
+
+    dataA = np.array(dataA, dtype='uint8')
+    dataA = np.expand_dims(dataA, axis=4)
+    discard_n = len(dataA) - len(dataA) // batch_size * batch_size  # because of batch namalization
+    dataA = np.delete(dataA, range(discard_n), axis=0)
+    print('^_^-training dataA finished-^_^')
+    return dataA
+
+
+def bose_datagenerator(dir1='../dataset/noise_free',  dir2='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs', dir3='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', batch_size=128, aug_times=3, patch_size=64, stride=20, threshold=0.1, verbose=False):
+    file_list1 = glob.glob(dir1+'/*.tif') + glob.glob(dir1+'/*.bmp')
+    file_list2 = glob.glob(dir2+'/*.tif')
+    file_list3 = glob.glob(dir3+'/*.tif')
+    file_list2 = sorted(file_list2)
+    file_list3 = sorted(file_list3)
+
+    data_noise_free = []
+    data_align = []
+    for i in range(len(file_list1)):
+        patches = unaligned_gen_patches(file_list1[i], aug_times, patch_size, stride, threshold)
+        for patch in patches:
+            data_noise_free.append(patch)
+        if verbose:
+            print(str(i+1) + '/' + str(len(file_list1)) + ' is done ^_^')
+
+    for i in range(len(file_list2)):
+        patches = aligned_gen_patches(file_list2[i], file_list3[i], aug_times, patch_size, stride, threshold)
+        for patch in patches:
+            data_align.append(patch)
+        if verbose:
+            print(str(i+1) + '/' + str(len(file_list1)) + ' is done ^_^')
+
+    data_noise_free = np.array(data_noise_free, dtype='uint8')
+    data_noise_free = np.expand_dims(data_noise_free, axis=4)
+    discard_n = len(data_noise_free) - len(data_noise_free) // batch_size * batch_size  # because of batch namalization
+    data_noise_free = np.delete(data_noise_free, range(discard_n), axis=0)
+    print('^_^-training data_noise_free finished-^_^')
+
+    data_align = np.array(data_align, dtype='uint8')
+    data_align = np.expand_dims(data_align, axis=4)
+    discard_n = len(data_align) - len(data_align) // batch_size * batch_size  # because of batch namalization
+    data_align = np.delete(data_align, range(discard_n), axis=0)
+    print('^_^-training data_align finished-^_^')
+
+    return data_noise_free, data_align
 
 def aligned_datagenerator(from_dir, to_dir, batch_size, aug_times, patch_size, stride, threshold, verbose=False):
     # generate clean patches from a dataset
-    file_list1 = glob.glob(from_dir+'/*.tif')
-    file_list2 = glob.glob(to_dir+'/*.tif')
+    file_list1 = glob.glob(from_dir+'/*.tif') + glob.glob(from_dir+'/*.bmp')
+    file_list2 = glob.glob(to_dir+'/*.tif') + glob.glob(from_dir+'/*.bmp')
     file_list1 = sorted(file_list1)
     file_list2 = sorted(file_list2)
     # initrialize
@@ -234,5 +337,5 @@ def unaligned_datagenerator_bmp(from_dir, to_dir, batch_size, aug_times, patch_s
 
 
 if __name__ == '__main__':
-    data = unaligned_datagenerator('../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', '../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs', 128, 3, 64, 20, 0.1)
-
+    # data = unaligned_datagenerator('../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', '../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs', 128, 3, 64, 20, 0.1)
+    dataA, dataB = bose_datagenerator('../dataset/noise_free','../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs','../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_175mAs', 128, 3, 64, 20, 0.1)
