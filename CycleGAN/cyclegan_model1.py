@@ -277,7 +277,7 @@ class CycleGANModel():
         # # GAN loss D_B(G_B(B))
         # self.loss_G_B = self.criterionGAN(self.netD_B(self.fake_A), True)
 
-        self.loss_G_B = torch.nn.L1Loss(self.fake_A, self.align_free)
+        self.loss_G_B = self.criterionCycle(self.fake_A, self.align_free)
 
         # Forward cycle loss || G_B(G_A(A)) - A||
         self.loss_cycle_A = self.criterionCycle(self.rec_A, self.real_A) * lambda_A

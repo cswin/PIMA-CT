@@ -50,7 +50,7 @@ parser.add_argument('--threshold', default=0.1, type=float, help='background thr
 parser.add_argument('--epoch', default=60, type=int, help='number of train epoches')
 parser.add_argument('--teach_nums', default=5, type=int, help='number of teach times')
 parser.add_argument('--datatype', default='unaligned', type=str, help='datatype: aligned or unaligned')
-parser.add_argument('--gpu_ids', type=str, default='-1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+parser.add_argument('--gpu_ids', type=str, default='0,1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 parser.add_argument('--input_nc', type=int, default=1, help='# of input image channels: 3 for RGB and 1 for grayscale')
 parser.add_argument('--output_nc', type=int, default=1,
                     help='# of output image channels: 3 for RGB and 1 for grayscale')
@@ -129,7 +129,6 @@ for teach_time in range(initial_time, args.teach_nums):
         for i, data in enumerate(DLoader):
             model.set_input(data)
             model.optimize_parameters()
-            print('--------------- phantom data ---------------')
             print('[%d/%d][%d/%d] Loss_DA: %.4f Loss_G: %.4f Loss_GA: %.4f Loss_GB: %.4f CycleA: %.4f CycleB: %.4f' % (
                 epoch, args.epoch, i, len(DLoader), model.loss_D_A, model.loss_G, model.loss_G_A,
                 model.loss_G_B, model.loss_cycle_A, model.loss_cycle_B))
