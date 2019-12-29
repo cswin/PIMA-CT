@@ -130,7 +130,7 @@ def realA_datagenerator(dir1='../dataset/noise_free', batch_size=128, aug_times=
             print(str(i + 1) + '/' + str(len(file_list1)) + ' is done ^_^')
 
     dataA = np.array(dataA, dtype='uint8')
-    dataA = np.expand_dims(dataA, axis=4)
+    dataA = np.expand_dims(dataA, axis=3)
     discard_n = len(dataA) - len(dataA) // batch_size * batch_size  # because of batch namalization
     dataA = np.delete(dataA, range(discard_n), axis=0)
     print('^_^-training dataA finished-^_^')
@@ -151,7 +151,7 @@ def realB_datagenerator(dir1='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_6
             print(str(i + 1) + '/' + str(len(file_list1)) + ' is done ^_^')
 
     dataA = np.array(dataA, dtype='uint8')
-    dataA = np.expand_dims(dataA, axis=4)
+    dataA = np.expand_dims(dataA, axis=3)
     discard_n = len(dataA) - len(dataA) // batch_size * batch_size  # because of batch namalization
     dataA = np.delete(dataA, range(discard_n), axis=0)
     print('^_^-training dataA finished-^_^')
