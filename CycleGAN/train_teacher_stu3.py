@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description='PyTorch CycleGAN')
 
 parser.add_argument('--lr', type=float, default=0.0002, help='learning rate, default=0.0002')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
-parser.add_argument('--model', default='teacher_stu_unet64_basic_60_unaligned_l2loss', type=str, help='choose a type of model')
+parser.add_argument('--model', default='teacher_stu_unet64_basic_60_unaligned_oneDiscriminator', type=str, help='choose a type of model')
 parser.add_argument('--batch_size', default=128, type=int, help='batch size')
 parser.add_argument('--aug_times', default=3, type=int, help='aug times')
 parser.add_argument('--patch_size', default=64, type=int, help='patch size')
