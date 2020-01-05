@@ -138,7 +138,7 @@ def realA_datagenerator(dir1='../dataset/noise_free', batch_size=128, aug_times=
 
 def realB_datagenerator(dir1='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_60mAs', batch_size=128, aug_times=3, patch_size=64, stride=20, threshold=0.1, verbose=False):
     # generate clean patches from a dataset
-    file_list1 = glob.glob(dir1 + '/*.tif')
+    file_list1 = glob.glob(dir1 + '/*.tif') + glob.glob(dir1 + '/*.bmp')
     file_list1 = sorted(file_list1)
     # initrialize
     dataA = []
@@ -154,7 +154,7 @@ def realB_datagenerator(dir1='../dataset/phantom/Head_05_VOLUME_4D_CBP_Dynamic_6
     dataA = np.expand_dims(dataA, axis=3)
     discard_n = len(dataA) - len(dataA) // batch_size * batch_size  # because of batch namalization
     dataA = np.delete(dataA, range(discard_n), axis=0)
-    print('^_^-training dataA finished-^_^')
+    print('^_^-training dataB finished-^_^')
     return dataA
 
 

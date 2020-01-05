@@ -282,9 +282,9 @@ class CycleGANModel():
         # Forward cycle loss || G_B(G_A(A)) - A||
         self.loss_cycle_A = self.criterionCycle(self.rec_A, self.real_A) * lambda_A
         # Backward cycle loss || G_A(G_B(B)) - B||
-        self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
-        # # loss_cycle_B loss有改变，是否不用L1loss 或 L2loss 而用判别器
-        # self.loss_cycle_B = self.criterionGAN(self.netD_A(self.rec_B), True) * lambda_B
+        # self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
+        # loss_cycle_B loss有改变，是否不用L1loss 或 L2loss 而用判别器
+        self.loss_cycle_B = self.criterionGAN(self.netD_A(self.rec_B), True) * lambda_B
 
         # combined loss and calculate gradients
         self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B  # + self.loss_DN
