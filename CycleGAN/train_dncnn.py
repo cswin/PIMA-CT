@@ -45,7 +45,6 @@ save_dir = os.path.join('models', args.model+'_' + args.from_does.split('_')[-1]
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
-
 class DnCNN(nn.Module):
     def __init__(self, depth=17, n_channels=64, image_channels=1, use_bnorm=True, kernel_size=3):
         super(DnCNN, self).__init__()
@@ -120,7 +119,7 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load(os.path.join(save_dir, 'model_%03d.pth' % initial_epoch)))
         # model = torch.load(os.path.join(save_dir, 'model_%03d.pth' % initial_epoch))
     model.train()
-    criterion = nn.MSELoss(reduction=sum)  # PyTorch 0.4.1
+    criterion = nn.MSELoss()  # PyTorch 0.4.1
     # criterion = nn.L1Loss()
     if cuda:
         model = model.cuda()
@@ -139,16 +138,16 @@ if __name__ == '__main__':
         epoch_loss = 0
         start_time = time.time()
         for n_count, batch in enumerate(DLoader):
-                optimizer.zero_grad()
-                if cuda:
-                    batch_x, batch_y = batch[0].cuda(), batch[1].cuda()
-                else:
-                    batch_x, batch_y = batch[0], batch[1]
-                loss = criterion(model(batch_x), batch_y)
-                epoch_loss += loss.item()
-                loss.backward()
-                optimizer.step()
-                print('%4d %4d / %4d loss = %2.4f' % (epoch+1, n_count, xs.size(0)//batch_size, loss.item()/batch_size))
+            optimizer.zero_grad()
+            if cuda:
+                batch_x, batch_y = batch[0].cuda(), batch[1].cuda()
+            else:
+                batch_x, batch_y = batch[0], batch[1]
+            loss = criterion(model(batch_x), batch_y)
+            epoch_loss += loss.item()
+            loss.backward()
+            optimizer.step()
+            print('%4d %4d / %4d loss = %2.4f' % (epoch+1, n_count, xs.size(0)//batch_size, loss.item()/batch_size))
         elapsed_time = time.time() - start_time
         scheduler.step(epoch)  # step to the learning rate in this epcoh
         log('epcoh = %4d , loss = %4.4f , time = %4.2f s' % (epoch+1, epoch_loss/n_count, elapsed_time))
