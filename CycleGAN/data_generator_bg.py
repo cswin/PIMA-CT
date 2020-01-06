@@ -66,8 +66,8 @@ def gen_patches(file_name1, file_name2, aug_times, patch_size, stride, threshold
 
 def datagenerator(from_dir, to_dir, batch_size, aug_times, patch_size, stride, threshold, verbose=False):
     # generate clean patches from a dataset
-    file_list1 = glob.glob(from_dir+'/*.tif')
-    file_list2 = glob.glob(to_dir+'/*.tif')
+    file_list1 = glob.glob(from_dir+'/*.tif') + glob.glob(from_dir+'/*.bmp')
+    file_list2 = glob.glob(to_dir+'/*.tif') + glob.glob(from_dir+'/*.bmp')
     file_list1 = sorted(file_list1)
     file_list2 = sorted(file_list2)
     # initrialize
