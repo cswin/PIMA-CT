@@ -21,14 +21,14 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 # Params
 parser = argparse.ArgumentParser(description='PyTorch DnCNN')
-parser.add_argument('--model', default='DnCNN-C_L1', type=str, help='choose a type of model')
+parser.add_argument('--model', default='DnCNNA_L1_Gua_20mAs', type=str, help='choose a type of model')
 parser.add_argument('--loss_type', default=1, type=int, help='loss type')
 parser.add_argument('--batch_size', default=128, type=int, help='batch size')
 parser.add_argument('--aug_times', default=3, type=int, help='aug times')
 parser.add_argument('--patch_size', default=64, type=int, help='patch size')
 parser.add_argument('--stride', default=20, type=int, help='stride')
-parser.add_argument('--from_does', default='../dataset/CT_Data_All_Patients/real_high_low_dose/train_low_dose', type=str, help='path of low-does data')
-parser.add_argument('--to_does', default='../dataset/CT_Data_All_Patients/real_high_low_dose/train_high_dose', type=str, help='path of high-does data')
+parser.add_argument('--from_does', default='../dataset/patients_noisy/Gua_sim_LD_20mAs/train', type=str, help='path of low-does data')
+parser.add_argument('--to_does', default='../dataset/CT_Data_All_Patients/train', type=str, help='path of high-does data')
 parser.add_argument('--epoch', default=50, type=int, help='number of train epoches')
 parser.add_argument('--lr', default=1e-4, type=float, help='initial learning rate for Adam')
 args = parser.parse_args()
