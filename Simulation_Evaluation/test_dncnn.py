@@ -22,7 +22,7 @@ def parse_args():
                         help='directory of test dataset')
     parser.add_argument('--model_dir', default='./model',
                         help='directory of the model')
-    parser.add_argument('--model_name', default='DnCNNC_Real_20mAs_50epoch.pth', type=str, help='the model name')
+    # parser.add_argument('--model_name', default='DnCNNC_Real_20mAs_50epoch.pth', type=str, help='the model name')
     parser.add_argument('--result_dir', default='results/DnCNNC-L1_onReal20mAsdata', type=str, help='directory of test dataset')
     return parser.parse_args()
 
