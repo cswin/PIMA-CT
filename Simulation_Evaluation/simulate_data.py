@@ -17,11 +17,11 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "7"
 parser = argparse.ArgumentParser(description='PyTorch CycleGAN')
 parser.add_argument('--set_dir', default='../dataset/CT_Data_All_Patients/test', type=str,
                     help='directory of test dataset')
-parser.add_argument('--model_dir', default='./models/train_DnCNNB_G_A',
+parser.add_argument('--model_dir', default='./models/DnCNNB-simulation-60mAs_G_A',
                     help='directory of the model:G_A==>high2low,simulate, G_B==>low2high,denoising')
-parser.add_argument('--model_name', default='model_002_030.pth', type=str, help='the model name')
+parser.add_argument('--model_name', default='model_001_007.pth', type=str, help='the model name')
 parser.add_argument('--isTrain', default=False, help='Train or Test')
-parser.add_argument('--result_dir', default='../dataset/CT_Data_All_Patients/test002030_simulate30mAs', type=str, help='directory of test dataset')
+parser.add_argument('--result_dir', default='../dataset/CT_Data_All_Patients/test002030_simulate60mAs', type=str, help='directory of test dataset')
 
 args = parser.parse_args()
 

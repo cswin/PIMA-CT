@@ -5,30 +5,28 @@
 import argparse
 import re
 import os, glob, datetime, time
-import numpy as np
 import torch
 import torch.nn as nn
-from torch.nn.modules.loss import _Loss
 import torch.nn.init as init
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from torch.optim.lr_scheduler import MultiStepLR
-import data_generator_bg as dg
-from data_generator_bg import DenoisingDataset
+import cycle_data_generator as dg
+from cycle_data_generator import DenoisingDataset
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 # Params
 parser = argparse.ArgumentParser(description='PyTorch DnCNN')
-parser.add_argument('--model', default='DnCNN-A_L1', type=str, help='choose a type of model')
+parser.add_argument('--model', default='DnCNN-B_L1', type=str, help='choose a type of model')
 parser.add_argument('--loss_type', default=1, type=int, help='loss type')
 parser.add_argument('--batch_size', default=128, type=int, help='batch size')
 parser.add_argument('--aug_times', default=3, type=int, help='aug times')
 parser.add_argument('--patch_size', default=64, type=int, help='patch size')
 parser.add_argument('--stride', default=20, type=int, help='stride')
-parser.add_argument('--from_does', default='../dataset/CT_Data_All_Patients/real_high_low_dose/train_low_dose', type=str, help='path of low-does data')
-parser.add_argument('--to_does', default='../dataset/CT_Data_All_Patients/real_high_low_dose/train_high_dose', type=str, help='path of high-does data')
+parser.add_argument('--from_does', default='../dataset/CT_Data_All_Patients/train002030_simulate30mAs', type=str, help='path of high-does data')
+parser.add_argument('--to_does', default='../dataset/CT_Data_All_Patients/train', type=str, help='path of low-does data')
 parser.add_argument('--epoch', default=50, type=int, help='number of train epoches')
 parser.add_argument('--lr', default=1e-4, type=float, help='initial learning rate for Adam')
 args = parser.parse_args()
@@ -45,6 +43,7 @@ save_dir = os.path.join('models', args.model+'_' + args.from_does.split('_')[-1]
 
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
+
 
 class DnCNN(nn.Module):
     def __init__(self, depth=17, n_channels=64, image_channels=1, use_bnorm=True, kernel_size=3):
@@ -79,19 +78,6 @@ class DnCNN(nn.Module):
                 init.constant_(m.bias, 0)
 
 
-class sum_squared_error(_Loss):  # PyTorch 0.4.1
-    """
-    Definition: sum_squared_error = 1/2 * nn.MSELoss(reduction = 'sum')
-    The backward is defined as: input-target
-    """
-    def __init__(self, size_average=None, reduce=None, reduction='sum'):
-        super(sum_squared_error, self).__init__(size_average, reduce, reduction)
-
-    def forward(self, input, target):
-        # return torch.sum(torch.pow(input-target,2), (0,1,2,3)).div_(2)
-        return torch.nn.functional.mse_loss(input, target, size_average=None, reduce=None, reduction='sum').div_(2)
-
-
 def findLastCheckpoint(save_dir):
     file_list = glob.glob(os.path.join(save_dir, 'model_*.pth'))
     if file_list:
@@ -118,12 +104,8 @@ if __name__ == '__main__':
     if initial_epoch > 0:
         print('resuming by loading epoch %03d' % initial_epoch)
         model.load_state_dict(torch.load(os.path.join(save_dir, 'model_%03d.pth' % initial_epoch)))
-        # model = torch.load(os.path.join(save_dir, 'model_%03d.pth' % initial_epoch))
     model.train()
-    if args.loss_type == 2:
-        criterion = nn.MSELoss(reduction='sum')  # PyTorch 0.4.1
-    else:
-        criterion = nn.L1Loss()
+    criterion = nn.L1Loss()
     if cuda:
         model = model.cuda()
         device_ids = [0]
@@ -133,7 +115,7 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = MultiStepLR(optimizer, milestones=[15, 30, 45], gamma=0.2)  # learning rates
     for epoch in range(initial_epoch, n_epoch):
-        xs = dg.datagenerator(args.from_does, args.to_does, batch_size, aug_times, patch_size, stride, 0.1)
+        xs = dg.aligned_datagenerator(args.from_does, args.to_does, batch_size, aug_times, patch_size, stride, 0.1)
         xs = xs.astype('float32')/255.0
         xs = torch.from_numpy(xs.transpose((0, 1, 4, 2, 3)))  # tensor of the clean patches, N X C X H X W
         DDataset = DenoisingDataset(xs)
