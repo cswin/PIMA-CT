@@ -18,12 +18,12 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--set_dir', default='../dataset/CT_Data_All_Patients/test002030_simulate30mAs', type=str,
+    parser.add_argument('--set_dir', default='./test_real20mAs', type=str,
                         help='directory of test dataset')
-    parser.add_argument('--model_dir', default='./models/DnCNN-A_L1_30mAs',
+    parser.add_argument('--model_dir', default='model',
                         help='directory of the model')
-    parser.add_argument('--model_name', default='model_044.pth', type=str, help='the model name')
-    parser.add_argument('--result_dir', default='results/DnCNN-A-L1_onsimulated30mAsdata', type=str, help='directory of test dataset')
+    parser.add_argument('--model_name', default='DnCNNB_30mAs.pth', type=str, help='the model name')
+    parser.add_argument('--result_dir', default='results/DnCNN-B-L1_onreal20mAsdata', type=str, help='directory of test dataset')
     return parser.parse_args()
 
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         ssims = []
         for im in os.listdir(args.set_dir):
             if im.endswith(".tif") or im.endswith(".jpg") or im.endswith(".bmp") or im.endswith(".png"):
-                clean = cv2.imread(os.path.join('../dataset/CT_Data_All_Patients/test', im), 0)
+                clean = cv2.imread(os.path.join('../dataset/CT_Data_All_Patients/real_high_dose', im), 0)
                 clean = np.array(clean, dtype=np.float32) / 255.0
 
                 x = np.array(imread(os.path.join(args.set_dir, im)), dtype=np.float32)/255.0
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
         psnr_avg = np.mean(psnrs)
         ssim_avg = np.mean(ssims)
-        print('PSNR = %2.2f dB, SSIM = %1.4f' % (psnr_avg, ssim_avg))
+        print('model = %s  PSNR = %2.2f dB, SSIM = %1.4f' % (pth, psnr_avg, ssim_avg))
 
         if psnr_avg > psnr_res:
             psnr_res = psnr_avg
