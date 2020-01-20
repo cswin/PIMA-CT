@@ -10,6 +10,7 @@ import torch.nn.init as init
 import torch
 import cv2
 from skimage.measure import compare_psnr, compare_ssim
+from skimage.io import imread, imsave
 
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -17,18 +18,26 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--set_dir', default='../dataset/CT_Data_All_Patients/test002030_simulate30mAs', type=str,
+    parser.add_argument('--set_dir', default='../dataset/CT_Data_All_Patients/real_high_low_dose/test_low_dose', type=str,
                         help='directory of test dataset')
-    parser.add_argument('--model_dir', default='./models/CycleGAN-B_withoutidentity_tuihua_G_B',
+    parser.add_argument('--model_dir', default='./model',
                         help='directory of the model')
-    parser.add_argument('--model_name', default='model_044.pth', type=str, help='the model name')
-    parser.add_argument('--result_dir', default='results/CycleGANB-L1_onsimulated30mAsdata', type=str, help='directory of test dataset')
+    parser.add_argument('--model_name', default='DnCNNC_Real_20mAs_50epoch.pth', type=str, help='the model name')
+    parser.add_argument('--result_dir', default='results/DnCNNC-L1_onReal20mAsdata', type=str, help='directory of test dataset')
     return parser.parse_args()
 
 
 def log(*args, **kwargs):
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S:"), *args, **kwargs)
 
+
+def save_result(result, path):
+    path = path if path.find('.') != -1 else path+'.png'
+    ext = os.path.splitext(path)[-1]
+    if ext in ('.txt', '.dlm'):
+        np.savetxt(path, result, fmt='%2.4f')
+    else:
+        imsave(path, np.clip(result, 0, 1))
 
 class DnCNN(nn.Module):
 
@@ -97,7 +106,7 @@ if __name__ == '__main__':
         ssims = []
         for im in os.listdir(args.set_dir):
             if im.endswith(".tif") or im.endswith(".jpg") or im.endswith(".bmp") or im.endswith(".png"):
-                clean = cv2.imread(os.path.join('../dataset/CT_Data_All_Patients/test', im), 0)
+                clean = cv2.imread(os.path.join('../dataset/CT_Data_All_Patients/real_high_low_dose/test_high_dose', im), 0)
                 clean = np.array(clean, dtype=np.float32) / 255.0
 
                 x = np.array(cv2.imread(os.path.join(args.set_dir, im), 0), dtype=np.float32)/255.0
@@ -110,6 +119,9 @@ if __name__ == '__main__':
                 x_ = x_.detach().numpy().astype(np.float32)
                 x_[np.where(clean == 0)] = 0
 
+                name, ext = os.path.splitext(im)
+                save_result(x_, path=os.path.join(args.result_dir, name + '_dncnn' + ext))  # save the denoised image
+
                 psnr_x_ = compare_psnr(clean, x_)
                 ssim_x_ = compare_ssim(clean, x_)
 
@@ -120,7 +132,7 @@ if __name__ == '__main__':
 
         psnr_avg = np.mean(psnrs)
         ssim_avg = np.mean(ssims)
-        print('PSNR = %2.2f dB, SSIM = %1.4f' % (psnr_avg, ssim_avg))
+        print('model = %s PSNR = %2.2f dB, SSIM = %1.4f' % (pth, psnr_avg, ssim_avg))
 
         if psnr_avg > psnr_res:
             psnr_res = psnr_avg
@@ -128,14 +140,36 @@ if __name__ == '__main__':
             res_model = pth
     print('Finally model = %s PSNR = %2.2f dB, SSIM = %1.4f' % (res_model, psnr_res, ssim_res))
     
-    model.load_state_dict(torch.load(os.path.join(args.model_dir, res_model)))
-    log('load trained model')
-    model.eval()  # evaluation mode
+    # model.load_state_dict(torch.load(os.path.join(args.model_dir, res_model)))
+    # log('load trained model')
+    # model.eval()  # evaluation mode
+    #
+    # for im in os.listdir(args.set_dir):
+    #     if im.endswith(".tif") or im.endswith(".jpg") or im.endswith(".bmp") or im.endswith(".png"):
+    #         x = np.array(cv2.imread(os.path.join(args.set_dir, im)), dtype=np.float32) / 255.0
+    #         clean = x
+    #         x = torch.from_numpy(x).view(1, -1, x.shape[0], x.shape[1])
+    #
+    #         x_ = model(x)  # inference
+    #         x_ = x_.view(x.shape[2], x.shape[3])
+    #         x_ = x_.cpu()
+    #         x_ = x_.detach().numpy().astype(np.float32)
+    #         x_[np.where(clean == 0)] = 0
+    #
+    #         name, ext = os.path.splitext(im)
+    #         save_result(x_, path=os.path.join(args.result_dir, name + '_dncnn' + ext))  # save the denoised image
+    #
+    #         x_ = x_ * 255.0
+    #         x_ = np.array(x_, dtype='uint8')
+    #         cv2.imwrite(os.path.join(args.result_dir, im), x_)
+
 
     for im in os.listdir(args.set_dir):
         if im.endswith(".tif") or im.endswith(".jpg") or im.endswith(".bmp") or im.endswith(".png"):
-            x = np.array(cv2.imread(os.path.join(args.set_dir, im)), dtype=np.float32) / 255.0
-            clean = x
+            clean = cv2.imread(os.path.join('../dataset/CT_Data_All_Patients/real_high_low_dose/test_high_dose', im), 0)
+            clean = np.array(clean, dtype=np.float32) / 255.0
+
+            x = np.array(imread(os.path.join(args.set_dir, im)), dtype=np.float32)/255.0
             x = torch.from_numpy(x).view(1, -1, x.shape[0], x.shape[1])
 
             x_ = model(x)  # inference
@@ -144,6 +178,14 @@ if __name__ == '__main__':
             x_ = x_.detach().numpy().astype(np.float32)
             x_[np.where(clean == 0)] = 0
 
-            x_ = x_ * 255.0
-            x_ = np.array(x_, dtype='uint8')
-            cv2.imwrite(os.path.join(args.result_dir, im), x_)
+            psnr_x_ = compare_psnr(clean, x_)
+            ssim_x_ = compare_ssim(clean, x_)
+
+            name, ext = os.path.splitext(im)
+            save_result(x_, path=os.path.join(args.result_dir, name+'_dncnn-psnr-'+str(psnr_x_)+'-ssim-'+str(ssim_x_)+ext))  # save the denoised image
+
+
+
+            print('%10s  PSNR: %2.2f SSIM: %1.4f' % (im, psnr_x_, ssim_x_))
+
+
