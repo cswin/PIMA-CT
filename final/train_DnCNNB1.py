@@ -172,8 +172,8 @@ for teach_time in range(initial_time, args.teach_nums):
     print("Re-prepare training dataset")
     data_align1 = dg.aligned_datagenerator(args.result_pseudo, args.dataset_noise_free, args.batch_size, args.aug_times,
                                            args.patch_size, args.stride, args.threshold)
-    data_align1 = data_align.astype('float32') / 255.0
-    data_align1 = torch.from_numpy(data_align.transpose((0, 1, 4, 2, 3)))
+    data_align1 = data_align1.astype('float32') / 255.0
+    data_align1 = torch.from_numpy(data_align1.transpose((0, 1, 4, 2, 3)))
     data_align2 = torch.cat((data_align, data_align1), 0)
 
     DDataset = BoseDenoisingDataset(data_realA, data_realB, data_align2)
