@@ -90,5 +90,6 @@ parser.add_argument('--pretrainGB', default='models/model_044.pth', type=str)
 - phantom_low 是simulation出来的病人数据
 - phantom_high是病人的清晰数据路径
 
-
+## train_DnCNNB2.py和cyclegan_model1.py
+分别算两次loss，并更改了学习率
 
