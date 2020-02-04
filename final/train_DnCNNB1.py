@@ -73,8 +73,8 @@ parser.add_argument('--epoch', default=30, type=int, help='number of train epoch
 parser.add_argument('--teach_nums', default=3, type=int, help='number of teach times')
 parser.add_argument('--gpu_ids', type=str, default='0,1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 parser.add_argument('--model_dir', default='models', type=str)
-parser.add_argument('--pretrainGA', default='models/pretrainGA.pth', type=str)
-parser.add_argument('--pretrainGB', default='models/model_044.pth', type=str)
+parser.add_argument('--pretrainGA', default='../CycleGAN/models/pretrainGA.pth', type=str)
+parser.add_argument('--pretrainGB', default='../CycleGAN/models/model_044.pth', type=str)
 
 args = parser.parse_args()
 
