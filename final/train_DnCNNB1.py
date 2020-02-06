@@ -18,7 +18,7 @@ from util import log
 import argparse
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "8,9"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
 parser = argparse.ArgumentParser(description='PyTorch CycleGAN')
@@ -69,12 +69,12 @@ parser.add_argument('--phantom_high', default='../dataset/phantom/Head_05_VOLUME
 parser.add_argument('--result_pseudo', default='../dataset/CT_Data_All_Patients/pseudo', type=str,
                     help='path of pseudo dictionary')
 
-parser.add_argument('--epoch', default=30, type=int, help='number of train epoches')
+parser.add_argument('--epoch', default=50, type=int, help='number of train epoches')
 parser.add_argument('--teach_nums', default=3, type=int, help='number of teach times')
-parser.add_argument('--gpu_ids', type=str, default='0,1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 parser.add_argument('--model_dir', default='models', type=str)
-parser.add_argument('--pretrainGA', default='models/pretrainGA.pth', type=str)
-parser.add_argument('--pretrainGB', default='models/model_044.pth', type=str)
+parser.add_argument('--pretrainGA', default='../CycleGAN/models/pretrainGA.pth', type=str)
+parser.add_argument('--pretrainGB', default='../CycleGAN/models/model_044.pth', type=str)
 
 args = parser.parse_args()
 
@@ -102,8 +102,8 @@ initial_time, initial_epoch = model.load_networks_teacher_stu(args)
 if initial_time != 0:
     data_align1 = dg.aligned_datagenerator(args.result_pseudo, args.dataset_noise_free, args.batch_size, args.aug_times,
                                           args.patch_size, args.stride, args.threshold)
-    data_align1 = data_align.astype('float32') / 255.0
-    data_align1 = torch.from_numpy(data_align.transpose((0, 1, 4, 2, 3)))
+    data_align1 = data_align1.astype('float32') / 255.0
+    data_align1 = torch.from_numpy(data_align1.transpose((0, 1, 4, 2, 3)))
     data_align2 = torch.cat((data_align, data_align1), 0)
 
     DDataset = BoseDenoisingDataset(data_realA, data_realB, data_align2)

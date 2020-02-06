@@ -18,7 +18,7 @@ from util import log
 import argparse
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "6,7"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 parser = argparse.ArgumentParser(description='PyTorch CycleGAN')
@@ -71,7 +71,7 @@ parser.add_argument('--result_pseudo', default='../dataset/CT_Data_All_Patients/
 
 parser.add_argument('--epoch', default=80, type=int, help='number of train epoches')
 parser.add_argument('--teach_nums', default=3, type=int, help='number of teach times')
-parser.add_argument('--gpu_ids', type=str, default='0,1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 parser.add_argument('--model_dir', default='models', type=str)
 parser.add_argument('--pretrainGA', default='../CycleGAN/models/pretrainGA.pth', type=str)
 parser.add_argument('--pretrainGB', default='../CycleGAN/models/model_044.pth', type=str)
