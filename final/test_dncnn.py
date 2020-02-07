@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/1/5 20:58
 # @Author  : xls56i
-import os, datetime
-os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-import argparse
 
+import argparse
+import os, datetime
 import numpy as np
 import torch.nn as nn
 import torch.nn.init as init
@@ -13,16 +11,18 @@ import torch
 import cv2
 from skimage.measure import compare_psnr, compare_ssim
 
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--set_dir', default='../dataset/patients_noisy/Gua_sim_LD_30mAs/test', type=str,
+    parser.add_argument('--set_dir', default='../dataset/CT_Data_All_Patients/test002030_simulate30mAs', type=str,
                         help='directory of test dataset')
-    parser.add_argument('--model_dir', default='./models/DnCNNB-simulation-30mAs_Gd',
+    parser.add_argument('--model_dir', default='./models/CycleGAN-B_withoutidentity_tuihua_G_B',
                         help='directory of the model')
     parser.add_argument('--model_name', default='model_044.pth', type=str, help='the model name')
-    parser.add_argument('--result_dir', default='results/Cyclegan_denoising_results_gaussian30mAs', type=str, help='directory of test dataset')
+    parser.add_argument('--result_dir', default='results/CycleGANB-L1_onsimulated30mAsdata', type=str, help='directory of test dataset')
     return parser.parse_args()
 
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     model_pth = os.listdir(args.model_dir)
     for pth in model_pth:
         model.load_state_dict(torch.load(os.path.join(args.model_dir, pth)))
-        log('load trained model：' + pth)
+        log('load trained model')
 
         model.eval()  # evaluation mode
 
