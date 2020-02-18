@@ -205,7 +205,7 @@ class CycleGANModel():
 
     def backward_G(self):
         """Calculate the loss for generators Gs and Gd"""
-        lambda1 = 5
+        lambda1 = 10
         lambda2 = 1
         lambda3 = 20
         lambda4 = 1

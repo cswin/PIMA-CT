@@ -5,7 +5,7 @@
       <paths name="SMILE1">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/pengliu/LDNSv2/LDNS" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/pengliu/LDNSv3/LDNS" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

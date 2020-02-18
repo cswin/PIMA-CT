@@ -207,8 +207,8 @@ class CycleGANModel():
         """Calculate the loss for generators Gs and Gd"""
         lambda1 = 1
         lambda2 = 1
-        lambda3 = 10
-        lambda4 = 10
+        lambda3 = 15
+        lambda4 = 15
         lambda5 = 1
 
         self.loss_Gs = self.criterionGAN(self.netDs(self.fake_B), True) * lambda1  # (b)图 Ds Loss

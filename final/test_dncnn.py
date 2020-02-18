@@ -12,17 +12,18 @@ import cv2
 from skimage.measure import compare_psnr, compare_ssim
 
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--set_dir', default='../dataset/CT_Data_All_Patients/test002030_simulate30mAs', type=str,
+    parser.add_argument('--set_dir', default='../dataset/patients_noisy/P003_Gua_30to60mAs', type=str,
                         help='directory of test dataset')
-    parser.add_argument('--model_dir', default='./models/CycleGAN-B_withoutidentity_tuihua_G_B',
+    parser.add_argument('--model_dir', default='./models/DnCNNA_simulation-gaussian-30mAs_liangci_0210_Gd',
                         help='directory of the model')
-    parser.add_argument('--model_name', default='model_044.pth', type=str, help='the model name')
-    parser.add_argument('--result_dir', default='results/CycleGANB-L1_onsimulated30mAsdata', type=str, help='directory of test dataset')
+    # parser.add_argument('--model_name', default='model_044.pth', type=str, help='the model name')
+    parser.add_argument('--clean_image_dir', default='../dataset/CT_Data_All_Patients/P003_clean')
+    parser.add_argument('--result_dir', default='results/CycleGANA-L1_onGaussian30mAsdata_20200210', type=str, help='directory of test dataset')
     return parser.parse_args()
 
 
@@ -97,7 +98,7 @@ if __name__ == '__main__':
         ssims = []
         for im in os.listdir(args.set_dir):
             if im.endswith(".tif") or im.endswith(".jpg") or im.endswith(".bmp") or im.endswith(".png"):
-                clean = cv2.imread(os.path.join('../dataset/CT_Data_All_Patients/test', im), 0)
+                clean = cv2.imread(os.path.join(args.clean_image_dir, im), 0)
                 clean = np.array(clean, dtype=np.float32) / 255.0
 
                 x = np.array(cv2.imread(os.path.join(args.set_dir, im), 0), dtype=np.float32)/255.0
@@ -109,7 +110,7 @@ if __name__ == '__main__':
                 x_ = x_.cpu()
                 x_ = x_.detach().numpy().astype(np.float32)
                 x_[np.where(clean == 0)] = 0
-
+                x_[np.where(clean == 1.0)] = 1.0
                 psnr_x_ = compare_psnr(clean, x_)
                 ssim_x_ = compare_ssim(clean, x_)
 
@@ -134,7 +135,7 @@ if __name__ == '__main__':
 
     for im in os.listdir(args.set_dir):
         if im.endswith(".tif") or im.endswith(".jpg") or im.endswith(".bmp") or im.endswith(".png"):
-            x = np.array(cv2.imread(os.path.join(args.set_dir, im)), dtype=np.float32) / 255.0
+            x = np.array(cv2.imread(os.path.join(args.set_dir, im), 0), dtype=np.float32) / 255.0
             clean = x
             x = torch.from_numpy(x).view(1, -1, x.shape[0], x.shape[1])
 
@@ -143,7 +144,7 @@ if __name__ == '__main__':
             x_ = x_.cpu()
             x_ = x_.detach().numpy().astype(np.float32)
             x_[np.where(clean == 0)] = 0
-
+            x_[np.where(clean == 1.0)] = 1.0
             x_ = x_ * 255.0
             x_ = np.array(x_, dtype='uint8')
             cv2.imwrite(os.path.join(args.result_dir, im), x_)
