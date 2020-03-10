@@ -15,13 +15,13 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "7"
 
 parser = argparse.ArgumentParser(description='PyTorch CycleGAN')
-parser.add_argument('--set_dir', default='../dataset/CT_Data_All_Patients/test', type=str,
+parser.add_argument('--set_dir', default='../dataset/Real_Low_Dose_10images/clean', type=str,
                     help='directory of test dataset')
-parser.add_argument('--model_dir', default='./models/DnCNNB-simulation-60mAs_G_A',
+parser.add_argument('--model_dir', default='./models/cyclegan_simulation_20mAs_4_2_Gs',
                     help='directory of the model:G_A==>high2low,simulate, G_B==>low2high,denoising')
 parser.add_argument('--model_name', default='model_001_007.pth', type=str, help='the model name')
 parser.add_argument('--isTrain', default=False, help='Train or Test')
-parser.add_argument('--result_dir', default='../dataset/CT_Data_All_Patients/test002030_simulate60mAs', type=str, help='directory of test dataset')
+parser.add_argument('--result_dir', default='../dataset/Real_Low_Dose_10images/pseudo20mAs', type=str, help='directory of test dataset')
 
 args = parser.parse_args()
 
@@ -52,6 +52,7 @@ if __name__ == '__main__':
         if im.endswith(".tif") or im.endswith(".jpg") or im.endswith(".bmp") or im.endswith(".png"):
             x = cv2.imread(os.path.join(args.set_dir, im), 0)
             pre_img = x
+
             height, weight = x.shape
             resize_h = round(height / 64) * 64
             resize_w = round(weight / 64) * 64
