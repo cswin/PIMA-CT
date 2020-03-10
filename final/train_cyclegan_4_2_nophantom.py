@@ -67,7 +67,7 @@ parser.add_argument('--result_pseudo', default='../dataset/CT_Data_All_Patients/
                     help='path of pseudo dictionary')
 
 parser.add_argument('--epoch', default=50, type=int, help='number of train epoches')
-parser.add_argument('--teach_nums', default=1, type=int, help='number of teach times')
+parser.add_argument('--teach_nums', default=3, type=int, help='number of teach times')
 parser.add_argument('--gpu_ids', type=str, default='0,1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 parser.add_argument('--model_dir', default='models', type=str)
 parser.add_argument('--pretrainGA', default='../CycleGAN/models/pretrainGA.pth', type=str)
