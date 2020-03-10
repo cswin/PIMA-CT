@@ -80,7 +80,7 @@ args = parser.parse_args()
 
 data_realA = dg.realA_datagenerator(args.dataset_noise_free, args.batch_size, args.aug_times,
                                               args.patch_size, args.stride, args.threshold)
-data_realB = dg.realA_datagenerator(args.phantom_low, args.batch_size, args.aug_times,
+data_realB = dg.realB_datagenerator(args.phantom_low, args.batch_size, args.aug_times,
                                               args.patch_size, args.stride, args.threshold)
 data_align = dg.aligned_datagenerator(args.phantom_low, args.phantom_high, args.batch_size, args.aug_times,
                                               args.patch_size, args.stride, args.threshold)
