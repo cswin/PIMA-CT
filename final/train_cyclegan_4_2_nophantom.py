@@ -96,14 +96,6 @@ DLoader = DataLoader(dataset=DDataset, num_workers=0, drop_last=True, batch_size
 model = CycleGANModel(args)
 initial_time, initial_epoch = model.load_networks_teacher_stu(args)
 
-if initial_time != 0:
-    data_align = dg.aligned_datagenerator(args.result_pseudo, args.dataset_unlabeled, args.batch_size, args.aug_times,
-                                          args.patch_size, args.stride, args.threshold)
-    data_align = data_align.astype('float32') / 255.0
-    data_align = torch.from_numpy(data_align.transpose((0, 1, 4, 2, 3)))
-
-    DDataset = BoseDenoisingDataset(data_realA, data_realB, data_align)
-    DLoader = DataLoader(dataset=DDataset, num_workers=0, drop_last=True, batch_size=args.batch_size, shuffle=True)
 
 for teach_time in range(initial_time, args.teach_nums):
     print('---------------- start %d times ----------------' % teach_time)
