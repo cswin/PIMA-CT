@@ -62,7 +62,6 @@ parser.add_argument('--dataset_unlabeled', default='../dataset/CT_Data_All_Patie
 
 parser.add_argument('--phantom_low', default='../dataset/patients_noisy/Gua_sim_LD_30mAs/train', type=str,
                     help='path of low-dose data')
-parser.add_argument()
 parser.add_argument('--result_pseudo', default='../dataset/CT_Data_All_Patients/pseudo_gaussian30mAs', type=str,
                     help='path of pseudo dictionary')
 
