@@ -1,5 +1,9 @@
-# LDNS
-Low-dose CT noise simulation and denosing
+
+# PIMA-CT: Physical Model-Aware Cyclic Simulation and Denoising for Ultra-Low-Dose CT Restoration
+ [Frontiers in Radiology’22 ] Peng Liu, Linsong Xu, Garrett Fullerton, Yao Xiao, James-Bond
+Nguyen, Zhongyu Li, Izabella Barreto, Catherine Olguin and Ruogu Fang: PIMA-CT: Physical
+Model-Aware Cyclic Simulation and Denoising for Ultralow-dose CT Restoration, in Frontiers in
+Radiology 2 (2022): 904601, section Artificial Intelligence in Radiology.
 
 
 
