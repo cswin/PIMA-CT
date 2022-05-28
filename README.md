@@ -11,7 +11,6 @@ pytorch==0.4.1
 ```
 
 
-<!-- 
 ## self-learning
 
 `LDNS/CycleGAN`目录下：
@@ -341,5 +340,5 @@ parser.add_argument('--result_dir', default='results', type=str, help='directory
 
 ### networks.py & util.py
 
-和DN中的一样 -->
+和DN中的一样  
 
