@@ -11,10 +11,10 @@ pytorch==0.4.1
 ```
 
 
-
+<!-- 
 ## self-learning
 
-进入`LDNS/CycleGAN`目录下：
+`LDNS/CycleGAN`目录下：
 
 ```python
 # 根据gpu情况更改train_teacher_stu2.py和test_teacher_stu.py的参数
@@ -341,5 +341,5 @@ parser.add_argument('--result_dir', default='results', type=str, help='directory
 
 ### networks.py & util.py
 
-和DN中的一样
+和DN中的一样 -->
 
